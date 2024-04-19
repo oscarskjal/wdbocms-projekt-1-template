@@ -119,6 +119,18 @@ getLocationAndWeather();
 
 //AI koden
 
+
+function saveAPIKey() {
+    const openaiApiKey = document.getElementById('openai-api-key').value.trim();
+    if (openaiApiKey === '') {
+        setStatusMessage('API key is missing!', 'error');
+        return;
+    }
+    localStorage.setItem('openAI_API_key', openaiApiKey);
+    setStatusMessage('API key saved successfully!', 'success');
+}
+
+
 async function queryOpenAIAPI(question) {
     try {
        
