@@ -92,17 +92,8 @@ async function getWeather(latitude, longitude) {
 
 
 
-// Kanske behövs inte!!!
 
-function updateApiKey() {
-    const newApiKey = prompt('din Api nyckel:');
-    if (newApiKey) {
-        localStorage.setItem('weatherApiKey', newApiKey);
-        console.log('API key updaterad.');
-    } else {
-        console.error('Ogiltig API key.');
-    }
-}
+
 
 function getLocationAndWeather() {
     if (navigator.geolocation) {
