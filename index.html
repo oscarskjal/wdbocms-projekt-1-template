@@ -4,40 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>External API Widgets</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
 <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-    <div class="footer">
-        <p>Widgets by skjalosc</p>
-    </div>
-
-
 <div class="widget-container" id="ip-widget">
-    <p>Laddar...</p>
-</div>
-
-<div class="widget-container" id="currency-widget">
+    <h2>IP Address Widget</h2>
     <p>Loading...</p>
 </div>
 
+<div class="widget-container" id="currency-widget">
+    <h2>Currency Exchange Rate Widget</h2>
+    <p>Loading...</p>
+</div>
 
 <div class="widget-container" id="quote-widget">
-    <p>Laddar...</p>
+    <h2>Random Quote Widget</h2>
+    <p>Loading...</p>
 </div>
 
 <div id="weather-widget">
-    <h2>Väder Widget</h2>
+    <h2>Weather Widget</h2>
     <div id="location"></div>
-    <div id="weather"></div>
     <div id="city"></div>
+    <div id="weather"></div>
 </div>
 
 <div>
-    <label for="question">Fråga:</label>
+    <label for="question">Question:</label>
     <input type="text" id="question" name="question">
-    <button onclick="askQuestion()">Fråga</button>
+    <button onclick="askQuestion()">Ask</button>
 </div>
 
 <div id="answer"></div>
@@ -46,21 +45,20 @@
     <i class="fas fa-cog"></i> 
 </div>
 
-
-
 <div id="settings-menu" class="menu">
     <h2>Settings</h2>
     <div id="api-keys">
         <label for="openai-api-key">OpenAI API Key:</label>
         <input type="text" id="openai-api-key">
-        <button onclick="saveOpenAIKey()">Save</button>
+        <button onclick="saveAPIKey()">Save</button>
+    </div>
+    <div id="weather-api-keys">
         <label for="weather-api-key">Weather API Key:</label>
         <input type="text" id="weather-api-key">
         <button onclick="saveWeatherKey()">Save</button>
     </div>
     <div id="status"></div>
 </div>
-
 
 
 <div id="content">
