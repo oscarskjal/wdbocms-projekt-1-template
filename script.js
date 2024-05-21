@@ -1,3 +1,5 @@
+const apiUrl = 'http://vm2208.kaj.pouta.csc.fi:8344/todos';
+
 async function fetchIP() {
     try {
         const response = await fetch('https://api.ipify.org?format=json');
@@ -41,61 +43,15 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchQuote();
     fetchTodos();
     getLocationAndWeather();
+    checkApiKey();
 });
 
-const apiUrl = 'http://vm2208.kaj.pouta.csc.fi:8344/todos';
-const authUrl = 'http://vm2208.kaj.pouta.csc.fi:8344';
-
-
-async function register() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch(`${authUrl}/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        const result = await response.json();
-        if (response.ok) {
-            localStorage.setItem('api_key', result.api_key);
-            document.getElementById('auth-widget').style.display = 'none';
-            document.getElementById('todo-widget').style.display = 'block';
-            fetchTodos();
-        } else {
-            alert(result.error);
-        }
-    } catch (error) {
-        console.error('Error registering:', error);
-    }
-}
-
-async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch(`${authUrl}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        const result = await response.json();
-        if (response.ok) {
-            localStorage.setItem('api_key', result.api_key);
-            document.getElementById('auth-widget').style.display = 'none';
-            document.getElementById('todo-widget').style.display = 'block';
-            fetchTodos();
-        } else {
-            alert(result.error);
-        }
-    } catch (error) {
-        console.error('Error logging in:', error);
+function checkApiKey() {
+    const apiKey = localStorage.getItem('api_key');
+    if (!apiKey) {
+        alert('Please set the API key in the settings menu.');
+    } else {
+        console.log(`API Key: ${apiKey}`);
     }
 }
 
@@ -146,11 +102,17 @@ async function createTodo() {
     }
 
     try {
+        console.log(`API Key: ${apiKey}`);
+        console.log(`Task: ${task}`);
+        console.log(`Category ID: ${categoryId}`);
+
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`,
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             },
             body: JSON.stringify({
                 task: task,
@@ -168,6 +130,7 @@ async function createTodo() {
         console.error('Error creating todo:', error);
     }
 }
+
 
 async function toggleTodoComplete(todoId, completed) {
     const apiKey = localStorage.getItem('api_key');
@@ -296,7 +259,7 @@ function saveTodoAPIKey() {
         setStatusMessage('ToDo API key is missing!', 'error');
         return;
     }
-    localStorage.setItem('todo_api_key', todoApiKey);
+    localStorage.setItem('api_key', todoApiKey);
     setStatusMessage('ToDo API key saved successfully!', 'success');
 }
 
