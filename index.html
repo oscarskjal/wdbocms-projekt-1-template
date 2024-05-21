@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>External API Widgets</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
 </head>
 <body>
@@ -33,16 +33,27 @@
     <div id="weather"></div>
 </div>
 
-<div>
-    <label for="question">Question:</label>
-    <input type="text" id="question" name="question">
-    <button onclick="askQuestion()">Ask</button>
+<div id="auth-widget">
+    <h2>Login / Register</h2>
+    <div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="register()">Register</button>
+        <button onclick="login()">Login</button>
+    </div>
+
+<div id="todo-widget" class="widget-container">
+    <h2>ToDo Widget</h2>
+    <div>
+        <input type="text" id="new-todo-task" placeholder="New ToDo Task">
+        <input type="text" id="new-todo-category" placeholder="Category ID">
+        <button onclick="createTodo()">Add ToDo</button>
+    </div>
+    <ul id="todo-list"></ul>
 </div>
 
-<div id="answer"></div>
-
 <div id="settings-icon" class="icon">
-    <i class="fas fa-cog"></i> 
+    <i class="fas fa-cog"></i>
 </div>
 
 <div id="settings-menu" class="menu">
@@ -57,16 +68,19 @@
         <input type="text" id="weather-api-key">
         <button onclick="saveWeatherKey()">Save</button>
     </div>
+    <div id="todo-api-keys">
+        <label for="todo-api-key">ToDo API Key:</label>
+        <input type="text" id="todo-api-key">
+        <button onclick="saveTodoAPIKey()">Save</button>
+    </div>
     <div id="status"></div>
 </div>
 
-
-<div id="content">
-    
-</div>
+<div id="content"></div>
 
 <script src="script.js"></script>
 
 </body>
 </html>
+
 

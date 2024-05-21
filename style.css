@@ -51,6 +51,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 #weather-widget h2 {
@@ -88,6 +89,66 @@
     color: #333;
 }
 
+
+
+
+
+#todo-widget {
+    background-color: #e0f7fa;
+}
+
+#todo-widget input {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#todo-widget button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #00796b;
+    color: white;
+    cursor: pointer;
+}
+
+#todo-list {
+    list-style: none;
+    padding: 0;
+}
+
+#todo-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#todo-list li.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+#todo-list button {
+    margin-left: 10px;
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#todo-list button.complete {
+    background-color: #388e3c;
+    color: white;
+}
+
+#todo-list button.delete {
+    background-color: #d32f2f;
+    color: white;
+}
 
 
 

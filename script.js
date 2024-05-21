@@ -23,8 +23,6 @@ async function fetchCurrency() {
     }
 }
 
-fetchCurrency();
-
 async function fetchQuote() {
     try {
         const response = await fetch('https://api.quotable.io/random');
@@ -41,7 +39,187 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchIP();
     fetchCurrency();
     fetchQuote();
+    fetchTodos();
+    getLocationAndWeather();
 });
+
+const apiUrl = 'http://vm2208.kaj.pouta.csc.fi:8344/todos';
+const authUrl = 'http://vm2208.kaj.pouta.csc.fi:8344';
+
+
+async function register() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch(`${authUrl}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        const result = await response.json();
+        if (response.ok) {
+            localStorage.setItem('api_key', result.api_key);
+            document.getElementById('auth-widget').style.display = 'none';
+            document.getElementById('todo-widget').style.display = 'block';
+            fetchTodos();
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        console.error('Error registering:', error);
+    }
+}
+
+async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch(`${authUrl}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        const result = await response.json();
+        if (response.ok) {
+            localStorage.setItem('api_key', result.api_key);
+            document.getElementById('auth-widget').style.display = 'none';
+            document.getElementById('todo-widget').style.display = 'block';
+            fetchTodos();
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        console.error('Error logging in:', error);
+    }
+}
+
+async function fetchTodos() {
+    const apiKey = localStorage.getItem('api_key');
+    if (!apiKey) {
+        alert('API key is missing!');
+        return;
+    }
+
+    try {
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+        const todos = await response.json();
+        renderTodos(todos);
+    } catch (error) {
+        console.error('Error fetching todos:', error);
+    }
+}
+
+function renderTodos(todos) {
+    const todoList = document.getElementById('todo-list');
+    todoList.innerHTML = '';
+
+    todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.className = todo.completed ? 'completed' : '';
+        li.innerHTML = `
+            ${todo.task} (Category: ${todo.categoryname})
+            <button class="complete" onclick="toggleTodoComplete(${todo.todoid}, ${!todo.completed})">Complete</button>
+            <button class="delete" onclick="deleteTodo(${todo.todoid})">Delete</button>
+        `;
+        todoList.appendChild(li);
+    });
+}
+
+async function createTodo() {
+    const task = document.getElementById('new-todo-task').value;
+    const categoryId = document.getElementById('new-todo-category').value;
+    const apiKey = localStorage.getItem('api_key');
+
+    if (!apiKey || !task || !categoryId) {
+        alert('API key, task, and category ID are required!');
+        return;
+    }
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                task: task,
+                category_id: categoryId
+            })
+        });
+        if (response.ok) {
+            fetchTodos();
+            document.getElementById('new-todo-task').value = '';
+            document.getElementById('new-todo-category').value = '';
+        } else {
+            alert('Error creating todo');
+        }
+    } catch (error) {
+        console.error('Error creating todo:', error);
+    }
+}
+
+async function toggleTodoComplete(todoId, completed) {
+    const apiKey = localStorage.getItem('api_key');
+    if (!apiKey) {
+        alert('API key is missing!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiUrl}/${todoId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                completed: completed
+            })
+        });
+        if (response.ok) {
+            fetchTodos();
+        } else {
+            alert('Error updating todo');
+        }
+    } catch (error) {
+        console.error('Error updating todo:', error);
+    }
+}
+
+async function deleteTodo(todoId) {
+    const apiKey = localStorage.getItem('api_key');
+    if (!apiKey) {
+        alert('API key is missing!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiUrl}/${todoId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+        if (response.ok) {
+            fetchTodos();
+        } else {
+            alert('Error deleting todo');
+        }
+    } catch (error) {
+        console.error('Error deleting todo:', error);
+    }
+}
 
 async function getWeather(latitude, longitude) {
     try {
@@ -92,8 +270,6 @@ if (!localStorage.getItem('weatherApiKey')) {
     updateApiKey(); // Call the function to update the weather API key if it's missing
 }
 
-getLocationAndWeather();
-
 function saveAPIKey() {
     const openaiApiKey = document.getElementById('openai-api-key').value.trim();
     if (openaiApiKey === '') {
@@ -102,7 +278,6 @@ function saveAPIKey() {
     }
     localStorage.setItem('openAI_API_key', openaiApiKey);
     setStatusMessage('API key saved successfully!', 'success');
-
 }
 
 function saveWeatherKey() {
@@ -115,6 +290,15 @@ function saveWeatherKey() {
     setStatusMessage('Weather API key saved successfully!', 'success');
 }
 
+function saveTodoAPIKey() {
+    const todoApiKey = document.getElementById('todo-api-key').value.trim();
+    if (todoApiKey === '') {
+        setStatusMessage('ToDo API key is missing!', 'error');
+        return;
+    }
+    localStorage.setItem('todo_api_key', todoApiKey);
+    setStatusMessage('ToDo API key saved successfully!', 'success');
+}
 
 function setStatusMessage(message, type) {
     const statusElement = document.getElementById('status');
