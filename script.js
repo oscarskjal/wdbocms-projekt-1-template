@@ -1,4 +1,12 @@
-const apiUrl = 'http://vm2208.kaj.pouta.csc.fi:8344/todos';
+document.addEventListener("DOMContentLoaded", function() {
+    fetchIP();
+    fetchCurrency();
+    fetchQuote();
+    fetchTodos();
+    getLocationAndWeather();
+});
+
+const apiUrl = 'https://vm2208.kaj.pouta.csc.fi:8344/todos';
 
 async function fetchIP() {
     try {
@@ -37,26 +45,8 @@ async function fetchQuote() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    fetchIP();
-    fetchCurrency();
-    fetchQuote();
-    fetchTodos();
-    getLocationAndWeather();
-    checkApiKey();
-});
-
-function checkApiKey() {
-    const apiKey = localStorage.getItem('api_key');
-    if (!apiKey) {
-        alert('Please set the API key in the settings menu.');
-    } else {
-        console.log(`API Key: ${apiKey}`);
-    }
-}
-
 async function fetchTodos() {
-    const apiKey = localStorage.getItem('api_key');
+    const apiKey = localStorage.getItem('todo_api_key');
     if (!apiKey) {
         alert('API key is missing!');
         return;
@@ -68,6 +58,9 @@ async function fetchTodos() {
                 'Authorization': `Bearer ${apiKey}`
             }
         });
+        if (!response.ok) {
+            throw new Error('Failed to fetch todos');
+        }
         const todos = await response.json();
         renderTodos(todos);
     } catch (error) {
@@ -94,7 +87,7 @@ function renderTodos(todos) {
 async function createTodo() {
     const task = document.getElementById('new-todo-task').value;
     const categoryId = document.getElementById('new-todo-category').value;
-    const apiKey = localStorage.getItem('api_key');
+    const apiKey = localStorage.getItem('todo_api_key');
 
     if (!apiKey || !task || !categoryId) {
         alert('API key, task, and category ID are required!');
@@ -102,38 +95,33 @@ async function createTodo() {
     }
 
     try {
-        console.log(`API Key: ${apiKey}`);
-        console.log(`Task: ${task}`);
-        console.log(`Category ID: ${categoryId}`);
-
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
                 task: task,
                 category_id: categoryId
             })
         });
-        if (response.ok) {
-            fetchTodos();
-            document.getElementById('new-todo-task').value = '';
-            document.getElementById('new-todo-category').value = '';
-        } else {
-            alert('Error creating todo');
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error creating todo:', errorData);
+            alert(`Error creating todo: ${errorData.error}`);
+            return;
         }
+        fetchTodos();
+        document.getElementById('new-todo-task').value = '';
+        document.getElementById('new-todo-category').value = '';
     } catch (error) {
         console.error('Error creating todo:', error);
     }
 }
 
-
 async function toggleTodoComplete(todoId, completed) {
-    const apiKey = localStorage.getItem('api_key');
+    const apiKey = localStorage.getItem('todo_api_key');
     if (!apiKey) {
         alert('API key is missing!');
         return;
@@ -150,18 +138,18 @@ async function toggleTodoComplete(todoId, completed) {
                 completed: completed
             })
         });
-        if (response.ok) {
-            fetchTodos();
-        } else {
+        if (!response.ok) {
             alert('Error updating todo');
+            return;
         }
+        fetchTodos();
     } catch (error) {
         console.error('Error updating todo:', error);
     }
 }
 
 async function deleteTodo(todoId) {
-    const apiKey = localStorage.getItem('api_key');
+    const apiKey = localStorage.getItem('todo_api_key');
     if (!apiKey) {
         alert('API key is missing!');
         return;
@@ -174,11 +162,11 @@ async function deleteTodo(todoId) {
                 'Authorization': `Bearer ${apiKey}`
             }
         });
-        if (response.ok) {
-            fetchTodos();
-        } else {
+        if (!response.ok) {
             alert('Error deleting todo');
+            return;
         }
+        fetchTodos();
     } catch (error) {
         console.error('Error deleting todo:', error);
     }
@@ -191,7 +179,7 @@ async function getWeather(latitude, longitude) {
             console.error('Weather API key is missing.');
             return;
         }
-        
+
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
 
         const response = await fetch(url);
@@ -229,10 +217,6 @@ function getLocationAndWeather() {
     }
 }
 
-if (!localStorage.getItem('weatherApiKey')) {
-    updateApiKey(); // Call the function to update the weather API key if it's missing
-}
-
 function saveAPIKey() {
     const openaiApiKey = document.getElementById('openai-api-key').value.trim();
     if (openaiApiKey === '') {
@@ -259,7 +243,7 @@ function saveTodoAPIKey() {
         setStatusMessage('ToDo API key is missing!', 'error');
         return;
     }
-    localStorage.setItem('api_key', todoApiKey);
+    localStorage.setItem('todo_api_key', todoApiKey);
     setStatusMessage('ToDo API key saved successfully!', 'success');
 }
 
